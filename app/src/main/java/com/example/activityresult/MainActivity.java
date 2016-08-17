@@ -21,6 +21,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doMagic(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
+        intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+        startActivityForResult(intent, PICK_CONTACT_REQUEST);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_CONTACT_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Uri contactUri = data.getData();
+
+                Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
+
+                if (cursor != null) {
+                    cursor.moveToFirst();
+                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+
+                    Log.d(TAG, "onActivityResult: " + name);
+
+                    cursor.close();
+                }
+
+            }
+        }
     }
 }
